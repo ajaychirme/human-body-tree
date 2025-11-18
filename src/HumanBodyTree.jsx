@@ -338,7 +338,14 @@ const DiagramNode = ({ node, level = 0, isLast = false, parentExpanded = true, s
   // Check if this node or any of its descendants match the search
   const checkNodeMatch = (n, term) => {
     if (term === '') return true;
-    if (n.name.toLowerCase().includes(term.toLowerCase())) return true;
+    const lowerTerm = term.toLowerCase().trim();
+    const lowerName = n.name.toLowerCase();
+    const lowerType = n.type.toLowerCase().replace('-', ' ');
+    
+    // Check if node name or type matches
+    if (lowerName.includes(lowerTerm) || lowerType.includes(lowerTerm)) return true;
+    
+    // Check children recursively
     if (n.children) {
       return n.children.some(child => checkNodeMatch(child, term));
     }
@@ -346,7 +353,10 @@ const DiagramNode = ({ node, level = 0, isLast = false, parentExpanded = true, s
   };
 
   const matchesSearch = checkNodeMatch(node, searchTerm);
-  const directMatch = searchTerm !== '' && node.name.toLowerCase().includes(searchTerm.toLowerCase());
+  const directMatch = searchTerm !== '' && (
+    node.name.toLowerCase().includes(searchTerm.toLowerCase().trim()) ||
+    node.type.toLowerCase().replace('-', ' ').includes(searchTerm.toLowerCase().trim())
+  );
 
   // Auto-expand if search term matches a descendant
   React.useEffect(() => {
